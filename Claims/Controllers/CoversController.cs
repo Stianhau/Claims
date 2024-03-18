@@ -45,7 +45,7 @@ public class CoversController : ControllerBase
             StartDate = coverReq.StartDate,
             Type = coverReq.Type
         };
-        _auditService.AuditCover(cover.Id, "POST");
+        await _auditService.AuditCover(cover.Id, "POST");
 
         try
         {
@@ -59,9 +59,9 @@ public class CoversController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public Task DeleteAsync(string id)
+    public async Task DeleteAsync(string id)
     {
-        _auditService.AuditCover(id, "DELETE");
-        return _coverService.DeleteCoverAsync(id);
+        await _auditService.AuditCover(id, "DELETE");
+        await _coverService.DeleteCoverAsync(id);
     }
 }

@@ -39,7 +39,7 @@ namespace Claims.Controllers
                 Type = claimReq.Type
             };
 
-            _auditService.AuditClaim(claim.Id, "POST");
+            await _auditService.AuditClaim(claim.Id, "POST");
 
             try
             {
@@ -53,10 +53,10 @@ namespace Claims.Controllers
         }
 
         [HttpDelete("{id}")]
-        public Task DeleteAsync(string id)
+        public async Task DeleteAsync(string id)
         {
-            _auditService.AuditClaim(id, "DELETE");
-            return _claimsService.DeleteClaimAsync(id);
+            await _auditService.AuditClaim(id, "DELETE");
+            await _claimsService.DeleteClaimAsync(id);
         }
 
         [HttpGet("{id}")]
