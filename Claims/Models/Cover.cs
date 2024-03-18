@@ -5,7 +5,7 @@ namespace Claims;
 public class Cover
 {
     [JsonProperty(PropertyName = "id")]
-    public string Id { get; set; }
+    public required string Id { get; set; }
 
     [JsonProperty(PropertyName = "startDate")]
     public DateOnly StartDate { get; set; }

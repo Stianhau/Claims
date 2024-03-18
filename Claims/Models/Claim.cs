@@ -6,16 +6,16 @@ namespace Claims
     public class Claim
     {
         [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+        public required string Id { get; set; }
         
         [JsonProperty(PropertyName = "coverId")]
-        public string CoverId { get; set; }
+        public required string CoverId { get; set; }
 
         [JsonProperty(PropertyName = "created")]
         public DateTime Created { get; set; }
 
         [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         [JsonProperty(PropertyName = "claimType")]
         public ClaimType Type { get; set; }
