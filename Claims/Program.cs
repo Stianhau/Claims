@@ -17,8 +17,8 @@ builder.Services.AddDbContext<AuditContext>(options => options.UseSqlServer(buil
 
 builder.Services.AddSingleton<CosmosClient>(serviceProvider =>
 {
-    string account = builder.Configuration.GetSection("CosmosDb:Account").Value;
-    string key = builder.Configuration.GetSection("CosmosDb:Key").Value;
+    string? account = builder.Configuration.GetSection("CosmosDb:Account").Value;
+    string? key = builder.Configuration.GetSection("CosmosDb:Key").Value;
     return new CosmosClient(account, key);
 });
 
