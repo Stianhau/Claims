@@ -7,6 +7,9 @@ namespace Claims.Tests
         [Theory]
         [InlineData("2024-01-01", "2024-01-01", CoverType.BulkCarrier, 1625)] // Only one day, no discounts default
         [InlineData("2024-01-01", "2024-01-01", CoverType.Yacht, 1375)] // Only one day, no discounts yacht
+        [InlineData("2024-01-01", "2024-01-01", CoverType.ContainerShip, 1625)] // Only one day, no discounts ContainerShip
+        [InlineData("2024-01-01", "2024-01-01", CoverType.PassengerShip, 1500)] // Only one day, no discounts PassengerShip
+        [InlineData("2024-01-01", "2024-01-01", CoverType.Tanker, 1875)] // Only one day, no discounts Tanker
         [InlineData("2024-01-01", "2024-01-31", CoverType.BulkCarrier, 50342.5)] // Exactly 31 days, one day discount default
         [InlineData("2024-01-01", "2024-01-31", CoverType.Yacht, 42556.25)] // Exactly 31 days, one day discount yacht
         [InlineData("2024-01-01", "2024-06-29", CoverType.BulkCarrier, 289201.25)] // Exactly 181 days, 150 days small discount, one day full discount default
