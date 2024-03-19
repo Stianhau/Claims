@@ -19,6 +19,10 @@ public class CoversController : ControllerBase
         _coverService = coverService;
     }
 
+    /// <summary>
+    /// Get all covers
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Cover>>> GetAsync()
     {
@@ -26,7 +30,14 @@ public class CoversController : ControllerBase
         return Ok(covers);
     }
 
+    /// <summary>
+    /// Get cover by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult<Cover>> GetAsync(string id)
     {
         var cover = await _coverService.GetCoverAsync(id);
@@ -34,8 +45,15 @@ public class CoversController : ControllerBase
         return Ok(cover);
     }
 
+    /// <summary>
+    /// Create cover
+    /// </summary>
+    /// <param name="coverReq"></param>
+    /// <returns></returns>
     [HttpPost]
-    public async Task<ActionResult> CreateAsync(CreateCoverRequest coverReq)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Cover>> CreateAsync(CreateCoverRequest coverReq)
     {
         string id = Guid.NewGuid().ToString();
         Cover cover = new Cover()
@@ -45,7 +63,7 @@ public class CoversController : ControllerBase
             StartDate = coverReq.StartDate,
             Type = coverReq.Type
         };
-        await _auditService.AuditCover(cover.Id, "POST");
+        _ = _auditService.AuditCover(cover.Id, "POST");
 
         try
         {
@@ -58,10 +76,40 @@ public class CoversController : ControllerBase
         }
     }
 
+
+    /// <summary>
+    /// Delete cover by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id}")]
-    public async Task DeleteAsync(string id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteAsync(string id)
     {
-        await _auditService.AuditCover(id, "DELETE");
-        await _coverService.DeleteCoverAsync(id);
+        _ = _auditService.AuditCover(id, "DELETE");
+        var deletedCover = await _coverService.DeleteCoverAsync(id);
+        if (deletedCover is null) return NotFound("Cover not found");
+        return NoContent();
+    }
+
+
+    /// <summary>
+    /// Calculate premium
+    /// </summary>
+    /// <param name="startDate"></param>
+    /// <param name="endDate"></param>
+    /// <param name="coverType"></param>
+    /// <returns></returns>
+    // For now i keep it in the CoversController but might be neccessary to move to a separate controller in the future if 
+    // premium calculator needs more endpoints
+    // Might need validation of inputs
+    [HttpPost("calculate-premium")]
+    // For now i keep it in the CoversController but might be neccessary to move to a separate controller in the future if 
+    // premium calculator needs more endpoints
+    // Might need validation of inputs
+    public ActionResult<decimal> ComputePremiumAsync(DateOnly startDate, DateOnly endDate, CoverType coverType)
+    {
+        return Ok(PremiumCalculator.ComputePremium(startDate, endDate, coverType));
     }
 }

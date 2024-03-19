@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Claims
 {
@@ -18,6 +19,7 @@ namespace Claims
         public required string Name { get; set; }
 
         [JsonProperty(PropertyName = "claimType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public ClaimType Type { get; set; }
 
         [JsonProperty(PropertyName = "damageCost")]
@@ -25,11 +27,14 @@ namespace Claims
 
     }
 
+
     public enum ClaimType
     {
+        // [EnumMember(Value = "Collision")] 
         Collision = 0,
         Grounding = 1,
         BadWeather = 2,
+        // [EnumMember(Value = "Fire")] 
         Fire = 3
     }
 }

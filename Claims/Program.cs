@@ -1,5 +1,5 @@
+using System.Reflection;
 using System.Text.Json.Serialization;
-using Claims;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,13 +24,15 @@ builder.Services.AddSingleton<CosmosClient>(serviceProvider =>
 
 builder.Services.AddScoped<IAuditService, AuditService>();
 
-builder.Services.AddSingleton<ICosmosRepository<Claim>>(sp => {
+builder.Services.AddSingleton<IClaimRepository>(sp =>
+{
     CosmosClient client = sp.GetRequiredService<CosmosClient>();
     Container container = InitialiseCosmosDbContainerAsync(client, "ClaimDb", "Claim").GetAwaiter().GetResult();
     return new ClaimRepository(container);
 });
 
-builder.Services.AddSingleton<ICosmosRepository<Cover>>(sp => {
+builder.Services.AddSingleton<ICoverRepository>(sp =>
+{
     CosmosClient client = sp.GetRequiredService<CosmosClient>();
     Container container = InitialiseCosmosDbContainerAsync(client, "ClaimDb", "Cover").GetAwaiter().GetResult();
     return new CoverRepository(container);
@@ -42,7 +44,11 @@ builder.Services.AddScoped<ICoverService, CoverService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
 
 var app = builder.Build();
 
@@ -67,7 +73,8 @@ using (var scope = app.Services.CreateScope())
 
 app.Run();
 
-static async Task<Container> InitialiseCosmosDbContainerAsync(CosmosClient client, string databaseName, string containerName){
+static async Task<Container> InitialiseCosmosDbContainerAsync(CosmosClient client, string databaseName, string containerName)
+{
     DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
     await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
     return client.GetContainer(databaseName, containerName);

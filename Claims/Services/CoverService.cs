@@ -2,40 +2,47 @@ using Claims;
 
 public class CoverService : ICoverService
 {
-    private readonly ICosmosRepository<Cover> _repository;
+    private readonly ICoverRepository _repository;
 
-    public CoverService(ICosmosRepository<Cover> repository)
+    public CoverService(ICoverRepository repository)
     {
         _repository = repository;
     }
 
-    public async Task AddCoverAsync(Cover cover)
+    public async Task<Cover> AddCoverAsync(Cover cover)
     {
+        DateOnly currDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
+        var startDate = cover.StartDate.DayNumber;
+        var endDate = cover.EndDate.DayNumber;
+        
+        // Expects that when the startDate and endDate is the same, insuranceLength will be 1 day
+        var insuranceLength = endDate - startDate + 1;
+        
+        if(endDate < startDate) {
+            throw new ArgumentException("The endDate cannot be before the startDate");
+        }
 
-        DateTime currDateTime = DateTime.Now;
-        TimeOnly currTime = TimeOnly.FromDateTime(currDateTime);
-        var startDate = cover.StartDate.ToDateTime(currTime);
-        var endDate = cover.EndDate.ToDateTime(currTime);
-        if ((endDate - startDate).TotalDays > 365)
+        // TODO: Cover leap years
+        if (insuranceLength > 365)
         {
             throw new ArgumentException("Cover duration cannot exceed one year");
         }
 
-        if (startDate < currDateTime ){
+        if (startDate < currDate.DayNumber) {
             throw new ArgumentException("The startDate cannot be in the past");
         }
 
         cover.Premium = PremiumCalculator.ComputePremium(cover.StartDate, cover.EndDate, cover.Type);
-        await _repository.AddAsync(cover);
+        return await _repository.AddAsync(cover);
     }
 
-    public async Task DeleteCoverAsync(string id)
+    public async Task<Cover?> DeleteCoverAsync(string id)
     {
-        await _repository.DeleteAsync(id);
+        return await _repository.DeleteAsync(id);
     }
 
-    public async Task<Cover> GetCoverAsync(string id)
+    public async Task<Cover?> GetCoverAsync(string id)
     {
         return await _repository.GetAsync(id);
     }

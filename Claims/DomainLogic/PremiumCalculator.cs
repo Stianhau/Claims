@@ -17,8 +17,8 @@ public static class PremiumCalculator
         decimal multiplier = coverTypeToMultiplier.ContainsKey(coverType) ? coverTypeToMultiplier[coverType] : defaultMultiplier;
 
         decimal premiumPerDay = baseDayRate * multiplier;
-        
-        // Expects that when the startDate and end date is the same it is a single day
+
+        // Expects that when the startDate and endDate is the same, insuranceLength will be 1 day
         decimal insuranceLength = endDate.DayNumber - startDate.DayNumber + 1;
 
         decimal discountNext150Days = coverType == CoverType.Yacht ? 0.05m : 0.02m;

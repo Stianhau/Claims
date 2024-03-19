@@ -1,7 +1,7 @@
 using Claims;
 using Microsoft.Azure.Cosmos;
 
-public class ClaimRepository : ICosmosRepository<Claim>
+public class ClaimRepository : IClaimRepository
     {
     private readonly Container _container;
 
@@ -15,9 +15,9 @@ public class ClaimRepository : ICosmosRepository<Claim>
         return await _container.CreateItemAsync(entity, new PartitionKey(entity.Id));
     }
 
-    public async Task DeleteAsync(string id)
+    public async Task<Claim?> DeleteAsync(string id)
     {
-        await _container.DeleteItemAsync<Claim>(id, new PartitionKey(id));
+        return await _container.DeleteItemAsync<Claim>(id, new PartitionKey(id));
     }
 
     public async Task<IEnumerable<Claim>> GetAllAsync()
@@ -33,7 +33,7 @@ public class ClaimRepository : ICosmosRepository<Claim>
         return results;
     }
 
-    public async Task<Claim> GetAsync(string id)
+    public async Task<Claim?> GetAsync(string id)
     {
         try
         {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Claims.Controllers
 {
+
     [ApiController]
     [Route("[controller]")]
     public class ClaimsController : ControllerBase
@@ -19,32 +20,43 @@ namespace Claims.Controllers
             _auditService = auditService;
         }
 
+        /// <summary>
+        /// Get all claims
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public Task<IEnumerable<Claim>> GetAsync()
+        public async Task<ActionResult<IEnumerable<Claim>>> GetAsync()
         {
-            return _claimsService.GetClaimsAsync();
+            return Ok(await _claimsService.GetClaimsAsync());
         }
 
+        /// <summary>
+        /// Create claim
+        /// </summary>
+        /// <param name="claimReq"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> CreateAsync(CreateClaimRequest claimReq)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Claim>> CreateAsync(CreateClaimRequest claimReq)
         {
             var id = Guid.NewGuid().ToString();
             Claim claim = new Claim()
             {
                 Id = id,
                 CoverId = claimReq.CoverId,
-                Created = DateTime.Now,
+                Created = DateTime.UtcNow,
                 DamageCost = claimReq.DamageCost,
                 Name = claimReq.Name,
                 Type = claimReq.Type
             };
 
-            await _auditService.AuditClaim(claim.Id, "POST");
+            _ = _auditService.AuditClaim(claim.Id, "POST");
 
             try
             {
-                await _claimsService.AddClaimAsync(claim);
-                return Ok(claim);
+                var res = await _claimsService.AddClaimAsync(claim);
+                return Ok(res);
             }
             catch (ArgumentException ex)
             {
@@ -52,17 +64,35 @@ namespace Claims.Controllers
             }
         }
 
+        /// <summary>
+        /// Delete claim by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
-        public async Task DeleteAsync(string id)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DeleteAsync(string id)
         {
-            await _auditService.AuditClaim(id, "DELETE");
-            await _claimsService.DeleteClaimAsync(id);
+            _ = _auditService.AuditClaim(id, "DELETE");
+            var deletedClaim = await _claimsService.DeleteClaimAsync(id);
+            if (deletedClaim is null) return NotFound("Claim not found");
+            return NoContent();
         }
 
+        /// <summary>
+        /// Get claim by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
-        public Task<Claim> GetAsync(string id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult<Claim>> GetAsync(string id)
         {
-            return _claimsService.GetClaimAsync(id);
+            var claim = await _claimsService.GetClaimAsync(id);
+            if (claim is null) return NoContent();
+            return Ok(claim);
         }
     }
 }
