@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -17,9 +18,8 @@ builder.Services.AddDbContext<AuditContext>(options => options.UseSqlServer(buil
 
 builder.Services.AddSingleton<CosmosClient>(serviceProvider =>
 {
-    string? account = builder.Configuration.GetSection("CosmosDb:Account").Value;
-    string? key = builder.Configuration.GetSection("CosmosDb:Key").Value;
-    return new CosmosClient(account, key);
+    var client = new CosmosClientBuilder("AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;DisableServerCertificateValidation=true").WithLimitToEndpoint(true).Build();
+    return client;
 });
 
 builder.Services.AddScoped<IAuditService, AuditService>();
@@ -40,7 +40,6 @@ builder.Services.AddSingleton<ICoverRepository>(sp =>
 
 builder.Services.AddScoped<IClaimsService, ClaimsService>();
 builder.Services.AddScoped<ICoverService, CoverService>();
-
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

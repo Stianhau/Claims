@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+  cosmosdb:
+    container_name: cosmosdb
+    image: "mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator"
+    tty: true
+    restart: always
+    # mem_limit: 2G
+    # cpu_count: 2
+    environment:
+      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10
+      - AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=127.0.0.1
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
+    ports:
+      - "8081:8081"
+      - "8900:8900"
+      - "8901:8901"
+      - "8979:8979"
+      - "10250:10250"
+      - "10251:10251"
+      - "10252:10252"
+      - "10253:10253"
+      - "10254:10254"
+      - "10255:10255"
+      - "10256:10256"
+      - "10350:10350"
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server
+    ports:
+      - 1433:1433  # MySQL port
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: examplepassword1!A
+    volumes:
+      - mssql:/var/opt/mssql
+
+volumes:
+  mssql:
