@@ -37,7 +37,7 @@ public class CoverService : ICoverService
         return await _repository.AddAsync(cover);
     }
 
-    public async Task<Cover?> DeleteCoverAsync(string id)
+    public async Task<bool> DeleteCoverAsync(string id)
     {
         return await _repository.DeleteAsync(id);
     }

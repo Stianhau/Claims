@@ -75,8 +75,8 @@ namespace Claims.Controllers
         public async Task<ActionResult> DeleteAsync(string id)
         {
             _ = _auditService.AuditClaim(id, "DELETE");
-            var deletedClaim = await _claimsService.DeleteClaimAsync(id);
-            if (deletedClaim is null) return NotFound("Claim not found");
+            var claimWasDeleted = await _claimsService.DeleteClaimAsync(id);
+            if (!claimWasDeleted) return NotFound("Claim not found");
             return NoContent();
         }
 

@@ -3,7 +3,7 @@ using Claims;
 using Microsoft.Azure.Cosmos;
 
 public class CoverRepository : ICoverRepository
-    {
+{
     private readonly Container _container;
 
     public CoverRepository(Container container)
@@ -16,9 +16,17 @@ public class CoverRepository : ICoverRepository
         return await _container.CreateItemAsync(entity, new PartitionKey(entity.Id));
     }
 
-    public async Task<Cover?> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
-        return await _container.DeleteItemAsync<Cover>(id, new PartitionKey(id));
+        try
+        {
+            await _container.DeleteItemAsync<Cover>(id, new PartitionKey(id));
+            return true;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return false;
+        }
     }
 
     public async Task<IEnumerable<Cover>> GetAllAsync()
