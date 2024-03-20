@@ -16,11 +16,10 @@ public class ClaimRepositoryMock : IClaimRepository
         return Task.FromResult(entity);
     }
 
-    public Task<Claim?> DeleteAsync(string id)
+    public Task<bool> DeleteAsync(string id)
     {
         var hasClaim = _claims.ContainsKey(id);
-        if(hasClaim) return Task.FromResult<Claim?>(_claims[id]);
-        return Task.FromResult<Claim?>(null);
+        return Task.FromResult(hasClaim);
     }
 
     public Task<IEnumerable<Claim>> GetAllAsync()

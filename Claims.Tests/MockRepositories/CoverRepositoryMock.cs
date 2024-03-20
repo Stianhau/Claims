@@ -16,9 +16,10 @@ public class CoverRepositoryMock : ICoverRepository
         return Task.FromResult(entity);
     }
 
-    public Task<Cover?> DeleteAsync(string id)
+    public Task<bool> DeleteAsync(string id)
     {
-        return Task.FromResult<Cover?>(_cover[id]);
+        var hasCover = _cover.ContainsKey(id);
+        return Task.FromResult(hasCover);
     }
 
     public Task<IEnumerable<Cover>> GetAllAsync()
@@ -29,7 +30,7 @@ public class CoverRepositoryMock : ICoverRepository
     public Task<Cover?> GetAsync(string id)
     {
         var hasClaim = _cover.ContainsKey(id);
-        if(hasClaim) return Task.FromResult<Cover?>(_cover[id]);
+        if (hasClaim) return Task.FromResult<Cover?>(_cover[id]);
         return Task.FromResult<Cover?>(null);
     }
 }

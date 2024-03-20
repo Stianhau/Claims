@@ -41,7 +41,7 @@ public class ClaimsService : IClaimsService
         return await _repository.GetAllAsync();
     }
 
-    public async Task<Claim?> DeleteClaimAsync(string id)
+    public async Task<bool> DeleteClaimAsync(string id)
     {
         return await _repository.DeleteAsync(id);
     }

@@ -15,9 +15,17 @@ public class ClaimRepository : IClaimRepository
         return await _container.CreateItemAsync(entity, new PartitionKey(entity.Id));
     }
 
-    public async Task<Claim?> DeleteAsync(string id)
-    {
-        return await _container.DeleteItemAsync<Claim>(id, new PartitionKey(id));
+    public async Task<bool> DeleteAsync(string id)
+    {   
+        try
+        {
+            await _container.DeleteItemAsync<Claim>(id, new PartitionKey(id));
+            return true;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return false;
+        }
     }
 
     public async Task<IEnumerable<Claim>> GetAllAsync()

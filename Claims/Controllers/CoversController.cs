@@ -88,8 +88,8 @@ public class CoversController : ControllerBase
     public async Task<ActionResult> DeleteAsync(string id)
     {
         _ = _auditService.AuditCover(id, "DELETE");
-        var deletedCover = await _coverService.DeleteCoverAsync(id);
-        if (deletedCover is null) return NotFound("Cover not found");
+        var coverWasDeleted = await _coverService.DeleteCoverAsync(id);
+        if (!coverWasDeleted) return NotFound("Cover not found");
         return NoContent();
     }
 
